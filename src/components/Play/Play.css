@@ -204,3 +204,20 @@
   color: #58a6ff;
   font-weight: bold;
 }
+
+.flow-step > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.flow-step > div strong {
+  margin-bottom: 2px;
+}
+
+.flow-step > div span {
+  display: block;
+}
+
+.flow-step {
+  margin-bottom: 10px;
+}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Play from './components/Play/Play.jsx';
 import Playground from './components/Playground/Playground.jsx';
@@ -14,6 +15,14 @@ export default function CommitCanvas() {
   const [activeCommand, setActiveCommand] = useState('');
   const [executedLogs, setExecutedLogs] = useState([]);
   const [playgroundKey, setPlaygroundKey] = useState(0);
+
+  // Live Git state shared with the Dashboard
+  const [gitDashboardState, setGitDashboardState] = useState({
+    isInitialized: false,
+    hasStaged: false,
+    commits: [],
+    logs: []
+  });
 
   // Dynamic Navbar Scroll Shrink State
   const [isScrolled, setIsScrolled] = useState(false);
@@ -77,6 +86,12 @@ export default function CommitCanvas() {
     setCommandInput('');
     setActiveCommand('');
     setExecutedLogs([]);
+    setGitDashboardState({
+      isInitialized: false,
+      hasStaged: false,
+      commits: [],
+      logs: []
+    });
     setPlaygroundKey((prev) => prev + 1);
   };
 
@@ -484,6 +499,266 @@ export default function CommitCanvas() {
         .final-cta { text-align: center; padding: 100px 20px 40px; }
         .final-cta h2 { font-size: 40px; margin-bottom: 32px; letter-spacing: -0.02em; }
         .large-btn { padding: 16px 40px; font-size: 16px; }
+
+        /* =========================================
+   DYNAMIC LEARN PANEL
+========================================= */
+
+.learn-panel {
+  animation: learnFadeIn 0.3s ease;
+}
+
+@keyframes learnFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.learn-empty {
+  text-align: center;
+  padding: 35px 10px;
+}
+
+.learn-empty-icon {
+  font-size: 32px;
+  margin-bottom: 14px;
+}
+
+.learn-empty h4 {
+  color: #ffffff;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.learn-empty p {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.learn-command-header {
+  margin-bottom: 18px;
+}
+
+.learn-label {
+  display: block;
+  color: #8b949e;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin-bottom: 7px;
+}
+
+.learn-command {
+  background: #010409;
+  border: 1px solid rgba(88, 166, 255, 0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-blue);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  overflow-x: auto;
+}
+
+.learn-command code {
+  color: #58a6ff;
+  white-space: nowrap;
+}
+
+.learn-title {
+  color: #ffffff;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.learn-description {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+  margin-bottom: 22px;
+}
+
+.learn-section {
+  margin-bottom: 22px;
+}
+
+.learn-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.learn-bullets {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.learn-bullet {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  color: #b8c0cc;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.bullet-number {
+  min-width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: rgba(88, 166, 255, 0.12);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.visual-flow {
+  background: #010409;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.visual-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 7px;
+  background: rgba(255,255,255,0.025);
+}
+
+.visual-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: rgba(88, 166, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.visual-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.visual-step-content strong {
+  color: #ffffff;
+  font-size: 10px;
+}
+
+.visual-step-content span {
+  color: var(--text-secondary);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.visual-arrow {
+  text-align: center;
+  color: var(--accent-blue);
+  font-size: 13px;
+  height: 16px;
+  line-height: 16px;
+}
+
+.learn-state {
+  background: rgba(88, 166, 255, 0.04);
+  border: 1px solid rgba(88, 166, 255, 0.15);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 18px;
+}
+
+.state-title {
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.state-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.state-item {
+  background: #010409;
+  border-radius: 7px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.state-item span {
+  color: var(--text-secondary);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.state-item strong {
+  color: #ffffff;
+  font-size: 10px;
+}
+
+.learn-result {
+  display: flex;
+  gap: 9px;
+  padding: 11px;
+  background: rgba(35, 134, 54, 0.08);
+  border: 1px solid rgba(35, 134, 54, 0.25);
+  border-radius: 9px;
+}
+
+.learn-result > span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(35, 134, 54, 0.2);
+  color: #3fb950;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.learn-result strong {
+  display: block;
+  color: #ffffff;
+  font-size: 10px;
+  margin-bottom: 3px;
+}
+
+.learn-result p {
+  color: #8b949e;
+  font-size: 10px;
+  line-height: 1.5;
+}
       `}</style>
 
       {/* Background Blobs */}
@@ -533,7 +808,10 @@ export default function CommitCanvas() {
             
             {/* Left Main Area: Visualizer + Integrated Terminal */}
             <div className="visualizer-section">
-              <Play commandToExecute={activeCommand} />
+              <Play
+                commandToExecute={activeCommand}
+                onStateChange={setGitDashboardState}
+              />
 
               {/* Integrated Git Terminal Input Bar */}
               <div className="command-terminal-wrapper">
@@ -629,33 +907,323 @@ export default function CommitCanvas() {
 
               <div className="side-content">
                 {sideTab === 'dashboard' && (
-                  <div>
-                    <h4 style={{ color: '#fff', marginBottom: '8px' }}>State & Flow</h4>
-                    <p style={{ color: 'var(--text-secondary)' }}>
-                      Visual representation of your current Git working directory, staging area, and branch HEAD state.
-                    </p>
-                  </div>
-                )}
-
-                {sideTab === 'learn' && (
-                  <div>
-                    <h4 style={{ color: '#fff', marginBottom: '8px' }}>Command Insights</h4>
-                    {activeCommand ? (
+                  <div className="dashboard-content">
+                    <div className="dashboard-heading">
                       <div>
-                        <p style={{ color: 'var(--accent-blue)', fontFamily: 'monospace', marginBottom: '8px' }}>
-                          ➜ {activeCommand}
-                        </p>
-                        <p style={{ color: 'var(--text-secondary)' }}>
-                          This command modifies the current workspace history and pushes nodes into your Git graph visualizer.
-                        </p>
+                        <h2>Git  Dashboard</h2>
+                        <br />
+                        <p>Live repository state</p>
                       </div>
-                    ) : (
-                      <p style={{ color: 'var(--text-secondary)' }}>
-                        Execute a command in the terminal to see detailed explanation and flow analysis here.
-                      </p>
-                    )}
+                      <span className={`status-dot ${gitDashboardState.isInitialized ? 'online' : ''}`}></span>
+                    </div>
+
+                    <div className="dashboard-stats">
+                      <div className="stat-card">
+                        <span className="stat-icon">🌿</span>
+                        <div><span className="stat-label">Branch</span>  <strong>main</strong></div>
+                      </div>
+                      <div className="stat-card">
+                        <span className="stat-icon">📦</span>
+                        <div><span className="stat-label">Commits</span>  <strong>{gitDashboardState.commits.length}</strong></div>
+                      </div>
+                      <div className="stat-card">
+                        <span className="stat-icon">📝</span>
+                        <div><span className="stat-label">Staging</span>  <strong>{gitDashboardState.hasStaged ? 'Ready' : 'Clean'}</strong></div>
+                      </div>
+                      <div className="stat-card">
+                        <span className="stat-icon">🚀</span>
+                        <div><span className="stat-label">Remote</span>  <strong>{gitDashboardState.commits.some((commit) => commit.pushed) ? 'Synced' : 'Local'}</strong></div>
+                        <br />
+                      </div>
+                    </div>
+                    <div className="git-flow">
+                      <h2>Repository Flow</h2>
+                      <br></br>
+
+                      <div className="flow-step">
+                        
+                        <div><strong>1. Working Directory</strong>
+                        <br />
+                        <span>Your project files</span></div>
+                      </div>
+                      <div className="flow-line"></div>
+
+                      <div className={`flow-step ${gitDashboardState.hasStaged ? 'active' : ''}`}>
+                        <div><strong>2. Staging Area</strong>
+                        <br />
+                        <span>{gitDashboardState.hasStaged ? 'Changes staged' : 'Nothing staged'}</span></div>
+                      </div>
+                      <div className="flow-line"></div>
+
+                      <div className={`flow-step ${gitDashboardState.commits.length > 0 ? 'active' : ''}`}>
+                        <div><strong>3. Local Repository</strong>
+                        <br />
+                        <span>{gitDashboardState.commits.length} commit{gitDashboardState.commits.length !== 1 ? 's' : ''}</span></div>
+                      </div>
+                      <div className="flow-line"></div>
+                      <div className={`flow-step ${gitDashboardState.commits.some((commit) => commit.pushed) ? 'active pushed' : ''}`}>
+                        <div><strong>4. Remote</strong>
+                        <br />
+                        <span>{gitDashboardState.commits.some((commit) => commit.pushed) ? 'origin/main synced' : 'Not pushed'}</span></div>
+                      </div>
+                    </div>
+
+                    <div className="recent-commits">
+                      <div className="section-title">
+                        <h5>Recent Commits</h5>
+
+                        <span>{gitDashboardState.commits.length}</span>
+                      </div>
+
+                    </div>
+
+                    <div className="repository-info">
+                    
+                      <div>
+   
+                      </div>
+                    </div>
                   </div>
                 )}
+                {sideTab === 'learn' && (
+  <div className="learn-panel">
+
+    {!gitDashboardState.commandInfo?.command ? (
+
+      <div className="learn-empty">
+
+        <div className="learn-empty-icon">💡</div>
+
+        <h4>Command Insights</h4>
+
+        <p>
+          Terminal mein koi Git command run karo.
+          Yahan us command ka visual explanation dikhega.
+        </p>
+
+      </div>
+
+    ) : (
+
+      <div className="learn-content">
+
+        {/* COMMAND HEADER */}
+
+        <div className="learn-command-header">
+
+          <span className="learn-label">
+            EXECUTED COMMAND
+          </span>
+
+          <div className="learn-command">
+            <span>➜</span>
+            <code>
+              {gitDashboardState.commandInfo.command}
+            </code>
+          </div>
+
+        </div>
+
+
+        {/* TITLE */}
+
+        <h4 className="learn-title">
+
+          {gitDashboardState.commandInfo.title}
+
+        </h4>
+
+
+        {/* SHORT DESCRIPTION */}
+
+        <p className="learn-description">
+
+          {gitDashboardState.commandInfo.shortDescription}
+
+        </p>
+
+
+        {/* WHAT HAPPENS */}
+
+        <div className="learn-section">
+
+          <div className="learn-section-title">
+            <span>⚙️</span>
+            What happens?
+          </div>
+
+          <div className="learn-bullets">
+
+            {gitDashboardState.commandInfo.whatHappens?.map(
+              (item, index) => (
+
+                <div
+                  className="learn-bullet"
+                  key={index}
+                >
+
+                  <span className="bullet-number">
+                    {index + 1}
+                  </span>
+
+                  <span>
+                    {item}
+                  </span>
+
+                </div>
+
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        {/* VISUAL FLOW */}
+
+        <div className="learn-section">
+
+          <div className="learn-section-title">
+            <span>🎯</span>
+            Visual Flow
+          </div>
+
+          <div className="visual-flow">
+
+            {gitDashboardState.commandInfo.visualization?.map(
+              (step, index) => (
+
+                <React.Fragment key={index}>
+
+                  <div className="visual-step">
+
+                    <div className="visual-icon">
+                      {step.icon}
+                    </div>
+
+                    <div className="visual-step-content">
+
+                      <strong>
+                        {step.title}
+                      </strong>
+
+                      <span>
+                        {step.text}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                  {index <
+                    gitDashboardState.commandInfo.visualization.length - 1 && (
+
+                    <div className="visual-arrow">
+                      ↓
+                    </div>
+
+                  )}
+
+                </React.Fragment>
+
+              )
+            )}
+
+          </div>
+
+        </div>
+
+
+        {/* CURRENT STATE */}
+
+        <div className="learn-state">
+
+          <div className="state-title">
+            📌 Current Git State
+          </div>
+
+          <div className="state-grid">
+
+            <div className="state-item">
+
+              <span>Repository</span>
+
+              <strong>
+                {gitDashboardState.isInitialized
+                  ? "Initialized"
+                  : "Not initialized"}
+              </strong>
+
+            </div>
+
+            <div className="state-item">
+
+              <span>Staging</span>
+
+              <strong>
+                {gitDashboardState.hasStaged
+                  ? "Changes staged"
+                  : "Clean"}
+              </strong>
+
+            </div>
+
+            <div className="state-item">
+
+              <span>Commits</span>
+
+              <strong>
+                {gitDashboardState.commits.length}
+              </strong>
+
+            </div>
+
+            <div className="state-item">
+
+              <span>Remote</span>
+
+              <strong>
+                {gitDashboardState.commits.some(
+                  (commit) => commit.pushed
+                )
+                  ? "Synced"
+                  : "Local"}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* RESULT */}
+
+        <div className="learn-result">
+
+          <span>✓</span>
+
+          <div>
+
+            <strong>
+              What this means
+            </strong>
+
+            <p>
+              {gitDashboardState.commandInfo.result}
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    )}
+
+  </div>
+)}
 
                 {sideTab === 'command' && (
                   <div>
