@@ -1,4 +1,4 @@
-// gitLogic.js
+// gitLogic.js - Core Git Simulation Logic
 
 export const initialLogs = [
   "Welcome! Type commands in the CLI input bar: git init, git add ., git commit -m \"msg\", git push"
