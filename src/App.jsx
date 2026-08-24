@@ -1241,9 +1241,9 @@ export default function CommitCanvas() {
                         <div className="step-code">git commit -m "msg"</div>
                         <div className="step-desc">Save staged snapshot to history</div>
                       </div>
-                      <div className="step-item" onClick={() => setCommandInput('git checkout -b feature')}>
-                        <div className="step-code">git checkout -b feature</div>
-                        <div className="step-desc">Create and switch to new branch</div>
+                      <div className="step-item" onClick={() => setCommandInput('git push')}>
+                        <div className="step-code">git push</div>
+                        <div className="step-desc">Push local commits to remote repository</div>
                       </div>
                     </div>
                   </div>
