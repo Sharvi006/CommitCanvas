@@ -128,6 +128,14 @@ Follow these steps to run CommitCanvas locally on your machine:
    npm run preview
    ```
 
+### Run the OTP backend
+
+1. Copy `.env.example` to `.env` (or use the generated `.env`) and add your Resend API key to `RESEND_API_KEY`.
+2. Start the backend in a separate terminal with `npm run server` (or `npm run server:watch` while developing).
+3. Start the frontend with `npm run dev`. The frontend uses `VITE_API_BASE_URL`, which defaults to `http://localhost:5000`.
+
+The backend accepts requests from `FRONTEND_ORIGIN` (default `http://localhost:5173`). OTP codes expire after five minutes and are held in memory, so restarting the server clears pending codes. `.env` is ignored by Git; keep API keys there and never commit them.
+
 ---
 
 ## 🎓 Academic / Project Context

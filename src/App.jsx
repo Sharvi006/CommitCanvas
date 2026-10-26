@@ -1,14 +1,22 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Play from './components/Play/Play.jsx';
 import Playground from './components/Playground/Playground.jsx';
 
-export default function CommitCanvas() {
+export default function CommitCanvas({ forcedTab } = {}) {
   // Main view state
-  const [activeTab, setActiveTab] = useState('home');
-  
+  const [activeTab, setActiveTab] = useState(forcedTab || 'home');
+
+  // Sync with forcedTab prop (router-driven)
+  useEffect(() => { if (forcedTab) setActiveTab(forcedTab); }, [forcedTab]);
+
+  // Router navigation
+  const navigate = useNavigate();
+
   // Playground Navigation sub-tabs
   const [sideTab, setSideTab] = useState('dashboard');
+
 
   // Terminal & Command states
   const [commandInput, setCommandInput] = useState('');
@@ -46,7 +54,7 @@ export default function CommitCanvas() {
     const observerOptions = {
       root: null,
       rootMargin: '0px',
-      threshold: 0.15 
+      threshold: 0.15
     };
 
     const observer = new IntersectionObserver((entries, obs) => {
@@ -81,6 +89,13 @@ export default function CommitCanvas() {
     setCommandInput('');
   };
 
+  // Preset Command Click Handler
+  const handlePresetClick = (cmd) => {
+    setCommandInput(cmd);
+    setActiveCommand(cmd);
+    setExecutedLogs((prev) => [...prev, cmd]);
+  };
+
   // Reset Playground Handler
   const handleResetPlayground = () => {
     setCommandInput('');
@@ -97,7 +112,7 @@ export default function CommitCanvas() {
 
   return (
     <>
-      {/* Page Styles */}
+      { }
       <style>{`
         :root {
             --bg-base: #0d1117;
@@ -368,6 +383,16 @@ export default function CommitCanvas() {
             margin-top: 2px;
         }
 
+        /* Command Tiers Layout */
+        .tier-container { display: flex; flex-direction: column; gap: 16px; }
+        .tier-card { background: #0d1117; border: 1px solid rgba(88, 166, 255, 0.2); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+        .tier-header { display: flex; flex-direction: column; gap: 2px; }
+        .tier-title { color: #58a6ff; font-size: 14px; font-weight: 700; }
+        .tier-subtitle { color: var(--text-secondary); font-size: 11px; }
+        .command-buttons-list { display: flex; flex-direction: column; gap: 8px; }
+        .command-btn { background: #161b22; border: 1px solid var(--border-color); color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 10px 12px; border-radius: 8px; text-align: left; cursor: pointer; transition: all 0.2s ease; width: 100%; }
+        .command-btn:hover { background: rgba(88, 166, 255, 0.1); border-color: #58a6ff; color: #ffffff; transform: translateX(3px); }
+
         /* Buttons */
         .glow-btn-purple {
             background: linear-gradient(135deg, #6e56cf 0%, #58a6ff 100%);
@@ -500,9 +525,7 @@ export default function CommitCanvas() {
         .final-cta h2 { font-size: 40px; margin-bottom: 32px; letter-spacing: -0.02em; }
         .large-btn { padding: 16px 40px; font-size: 16px; }
 
-        /* =========================================
-   DYNAMIC LEARN PANEL
-========================================= */
+
 
 .learn-panel {
   animation: learnFadeIn 0.3s ease;
@@ -784,16 +807,16 @@ export default function CommitCanvas() {
               </svg>
             </div>
           </div>
-          
+
           <div className="nav-center">
             <button onClick={() => setActiveTab('home')} className={activeTab === 'home' ? 'active' : ''}>Work</button>
-            <button onClick={() => setActiveTab('home')}>About</button>
             <button onClick={() => setActiveTab('playground')} className={activeTab === 'playground' ? 'active' : ''}>Playground</button>
-            <button onClick={() => setActiveTab('home')}>Resource</button>
+            <button onClick={() => navigate('/learning')}>Learn</button>
+            <button onClick={() => navigate('/challenges')} style={{ color: '#a78bfa' }}>Challenges</button>
           </div>
 
           <div className="nav-right">
-            <a href="#" className="btn-login">Log In</a>
+            <a href="/login" className="btn-login" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>Log In</a>
           </div>
         </nav>
       </header>
@@ -805,7 +828,7 @@ export default function CommitCanvas() {
           <Playground />
 
           <div className="playground-main-grid">
-            
+
             {/* Left Main Area: Visualizer + Integrated Terminal */}
             <div className="visualizer-section">
               <Play
@@ -850,8 +873,8 @@ export default function CommitCanvas() {
                     </div>
 
                     <div className="command-actions">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="glow-btn-outline"
                         onClick={handleResetPlayground}
                       >
@@ -861,8 +884,8 @@ export default function CommitCanvas() {
                         Reset
                       </button>
 
-                      <button 
-                        type="submit" 
+                      <button
+                        type="submit"
                         className="glow-btn-purple"
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -879,29 +902,23 @@ export default function CommitCanvas() {
             {/* Right Side Panel with 4-Tab Navigation */}
             <div className="side-panel">
               <div className="side-nav">
-                <button 
-                  className={sideTab === 'dashboard' ? 'active' : ''} 
+                <button
+                  className={sideTab === 'dashboard' ? 'active' : ''}
                   onClick={() => setSideTab('dashboard')}
                 >
                   Dashboard
                 </button>
-                <button 
-                  className={sideTab === 'learn' ? 'active' : ''} 
+                <button
+                  className={sideTab === 'learn' ? 'active' : ''}
                   onClick={() => setSideTab('learn')}
                 >
                   Learn
                 </button>
-                <button 
-                  className={sideTab === 'command' ? 'active' : ''} 
+                <button
+                  className={sideTab === 'command' ? 'active' : ''}
                   onClick={() => setSideTab('command')}
                 >
                   Command
-                </button>
-                <button 
-                  className={sideTab === 'about' ? 'active' : ''} 
-                  onClick={() => setSideTab('about')}
-                >
-                  About
                 </button>
               </div>
 
@@ -941,30 +958,30 @@ export default function CommitCanvas() {
                       <br></br>
 
                       <div className="flow-step">
-                        
+
                         <div><strong>1. Working Directory</strong>
-                        <br />
-                        <span>Your project files</span></div>
+                          <br />
+                          <span>Your project files</span></div>
                       </div>
                       <div className="flow-line"></div>
 
                       <div className={`flow-step ${gitDashboardState.hasStaged ? 'active' : ''}`}>
                         <div><strong>2. Staging Area</strong>
-                        <br />
-                        <span>{gitDashboardState.hasStaged ? 'Changes staged' : 'Nothing staged'}</span></div>
+                          <br />
+                          <span>{gitDashboardState.hasStaged ? 'Changes staged' : 'Nothing staged'}</span></div>
                       </div>
                       <div className="flow-line"></div>
 
                       <div className={`flow-step ${gitDashboardState.commits.length > 0 ? 'active' : ''}`}>
                         <div><strong>3. Local Repository</strong>
-                        <br />
-                        <span>{gitDashboardState.commits.length} commit{gitDashboardState.commits.length !== 1 ? 's' : ''}</span></div>
+                          <br />
+                          <span>{gitDashboardState.commits.length} commit{gitDashboardState.commits.length !== 1 ? 's' : ''}</span></div>
                       </div>
                       <div className="flow-line"></div>
                       <div className={`flow-step ${gitDashboardState.commits.some((commit) => commit.pushed) ? 'active pushed' : ''}`}>
                         <div><strong>4. Remote</strong>
-                        <br />
-                        <span>{gitDashboardState.commits.some((commit) => commit.pushed) ? 'origin/main synced' : 'Not pushed'}</span></div>
+                          <br />
+                          <span>{gitDashboardState.commits.some((commit) => commit.pushed) ? 'origin/main synced' : 'Not pushed'}</span></div>
                       </div>
                     </div>
 
@@ -978,283 +995,330 @@ export default function CommitCanvas() {
                     </div>
 
                     <div className="repository-info">
-                    
+
                       <div>
-   
+
                       </div>
                     </div>
                   </div>
                 )}
                 {sideTab === 'learn' && (
-  <div className="learn-panel">
+                  <div className="learn-panel">
 
-    {!gitDashboardState.commandInfo?.command ? (
+                    {!gitDashboardState.commandInfo?.command ? (
 
-      <div className="learn-empty">
+                      <div className="learn-empty">
 
-        <div className="learn-empty-icon">💡</div>
+                        <div className="learn-empty-icon">💡</div>
 
-        <h4>Command Insights</h4>
+                        <h4>Command Insights</h4>
 
-        <p>
-          Terminal mein koi Git command run karo.
-          Yahan us command ka visual explanation dikhega.
-        </p>
+                        <p>
+                          Terminal mein koi Git command run karo.
+                          Yahan us command ka visual explanation dikhega.
+                        </p>
 
-      </div>
-
-    ) : (
-
-      <div className="learn-content">
-
-        {/* COMMAND HEADER */}
-
-        <div className="learn-command-header">
-
-          <span className="learn-label">
-            EXECUTED COMMAND
-          </span>
-
-          <div className="learn-command">
-            <span>➜</span>
-            <code>
-              {gitDashboardState.commandInfo.command}
-            </code>
-          </div>
-
-        </div>
-
-
-        {/* TITLE */}
-
-        <h4 className="learn-title">
-
-          {gitDashboardState.commandInfo.title}
-
-        </h4>
-
-
-        {/* SHORT DESCRIPTION */}
-
-        <p className="learn-description">
-
-          {gitDashboardState.commandInfo.shortDescription}
-
-        </p>
-
-
-        {/* WHAT HAPPENS */}
-
-        <div className="learn-section">
-
-          <div className="learn-section-title">
-            <span>⚙️</span>
-            What happens?
-          </div>
-
-          <div className="learn-bullets">
-
-            {gitDashboardState.commandInfo.whatHappens?.map(
-              (item, index) => (
-
-                <div
-                  className="learn-bullet"
-                  key={index}
-                >
-
-                  <span className="bullet-number">
-                    {index + 1}
-                  </span>
-
-                  <span>
-                    {item}
-                  </span>
-
-                </div>
-
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        {/* VISUAL FLOW */}
-
-        <div className="learn-section">
-
-          <div className="learn-section-title">
-            <span>🎯</span>
-            Visual Flow
-          </div>
-
-          <div className="visual-flow">
-
-            {gitDashboardState.commandInfo.visualization?.map(
-              (step, index) => (
-
-                <React.Fragment key={index}>
-
-                  <div className="visual-step">
-
-                    <div className="visual-icon">
-                      {step.icon}
-                    </div>
-
-                    <div className="visual-step-content">
-
-                      <strong>
-                        {step.title}
-                      </strong>
-
-                      <span>
-                        {step.text}
-                      </span>
-
-                    </div>
-
-                  </div>
-
-                  {index <
-                    gitDashboardState.commandInfo.visualization.length - 1 && (
-
-                    <div className="visual-arrow">
-                      ↓
-                    </div>
-
-                  )}
-
-                </React.Fragment>
-
-              )
-            )}
-
-          </div>
-
-        </div>
-
-
-        {/* CURRENT STATE */}
-
-        <div className="learn-state">
-
-          <div className="state-title">
-            📌 Current Git State
-          </div>
-
-          <div className="state-grid">
-
-            <div className="state-item">
-
-              <span>Repository</span>
-
-              <strong>
-                {gitDashboardState.isInitialized
-                  ? "Initialized"
-                  : "Not initialized"}
-              </strong>
-
-            </div>
-
-            <div className="state-item">
-
-              <span>Staging</span>
-
-              <strong>
-                {gitDashboardState.hasStaged
-                  ? "Changes staged"
-                  : "Clean"}
-              </strong>
-
-            </div>
-
-            <div className="state-item">
-
-              <span>Commits</span>
-
-              <strong>
-                {gitDashboardState.commits.length}
-              </strong>
-
-            </div>
-
-            <div className="state-item">
-
-              <span>Remote</span>
-
-              <strong>
-                {gitDashboardState.commits.some(
-                  (commit) => commit.pushed
-                )
-                  ? "Synced"
-                  : "Local"}
-              </strong>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        {/* RESULT */}
-
-        <div className="learn-result">
-
-          <span>✓</span>
-
-          <div>
-
-            <strong>
-              What this means
-            </strong>
-
-            <p>
-              {gitDashboardState.commandInfo.result}
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    )}
-
-  </div>
-)}
-
-                {sideTab === 'command' && (
-                  <div>
-                    <h4 style={{ color: '#fff', marginBottom: '12px' }}>Recommended Steps</h4>
-                    <div className="step-list">
-                      <div className="step-item" onClick={() => setCommandInput('git init')}>
-                        <div className="step-code">git init</div>
-                        <div className="step-desc">Initialize a new Git repository</div>
                       </div>
-                      <div className="step-item" onClick={() => setCommandInput('git add .')}>
-                        <div className="step-code">git add .</div>
-                        <div className="step-desc">Stage all untracked changes</div>
+
+                    ) : (
+
+                      <div className="learn-content">
+
+                        {/* COMMAND HEADER */}
+
+                        <div className="learn-command-header">
+
+                          <span className="learn-label">
+                            EXECUTED COMMAND
+                          </span>
+
+                          <div className="learn-command">
+                            <span>➜</span>
+                            <code>
+                              {gitDashboardState.commandInfo.command}
+                            </code>
+                          </div>
+
+                        </div>
+
+
+                        {/* TITLE */}
+
+                        <h4 className="learn-title">
+
+                          {gitDashboardState.commandInfo.title}
+
+                        </h4>
+
+
+                        {/* SHORT DESCRIPTION */}
+
+                        <p className="learn-description">
+
+                          {gitDashboardState.commandInfo.shortDescription}
+
+                        </p>
+
+
+                        {/* WHAT HAPPENS */}
+
+                        <div className="learn-section">
+
+                          <div className="learn-section-title">
+                            <span>⚙️</span>
+                            What happens?
+                          </div>
+
+                          <div className="learn-bullets">
+
+                            {gitDashboardState.commandInfo.whatHappens?.map(
+                              (item, index) => (
+
+                                <div
+                                  className="learn-bullet"
+                                  key={index}
+                                >
+
+                                  <span className="bullet-number">
+                                    {index + 1}
+                                  </span>
+
+                                  <span>
+                                    {item}
+                                  </span>
+
+                                </div>
+
+                              )
+                            )}
+
+                          </div>
+
+                        </div>
+
+
+                        {/* VISUAL FLOW */}
+
+                        <div className="learn-section">
+
+                          <div className="learn-section-title">
+                            <span>🎯</span>
+                            Visual Flow
+                          </div>
+
+                          <div className="visual-flow">
+
+                            {gitDashboardState.commandInfo.visualization?.map(
+                              (step, index) => (
+
+                                <React.Fragment key={index}>
+
+                                  <div className="visual-step">
+
+                                    <div className="visual-icon">
+                                      {step.icon}
+                                    </div>
+
+                                    <div className="visual-step-content">
+
+                                      <strong>
+                                        {step.title}
+                                      </strong>
+
+                                      <span>
+                                        {step.text}
+                                      </span>
+
+                                    </div>
+
+                                  </div>
+
+                                  {index <
+                                    gitDashboardState.commandInfo.visualization.length - 1 && (
+
+                                      <div className="visual-arrow">
+                                        ↓
+                                      </div>
+
+                                    )}
+
+                                </React.Fragment>
+
+                              )
+                            )}
+
+                          </div>
+
+                        </div>
+
+
+                        {/* CURRENT STATE */}
+
+                        <div className="learn-state">
+
+                          <div className="state-title">
+                            📌 Current Git State
+                          </div>
+
+                          <div className="state-grid">
+
+                            <div className="state-item">
+
+                              <span>Repository</span>
+
+                              <strong>
+                                {gitDashboardState.isInitialized
+                                  ? "Initialized"
+                                  : "Not initialized"}
+                              </strong>
+
+                            </div>
+
+                            <div className="state-item">
+
+                              <span>Staging</span>
+
+                              <strong>
+                                {gitDashboardState.hasStaged
+                                  ? "Changes staged"
+                                  : "Clean"}
+                              </strong>
+
+                            </div>
+
+                            <div className="state-item">
+
+                              <span>Commits</span>
+
+                              <strong>
+                                {gitDashboardState.commits.length}
+                              </strong>
+
+                            </div>
+
+                            <div className="state-item">
+
+                              <span>Remote</span>
+
+                              <strong>
+                                {gitDashboardState.commits.some(
+                                  (commit) => commit.pushed
+                                )
+                                  ? "Synced"
+                                  : "Local"}
+                              </strong>
+
+                            </div>
+
+                          </div>
+
+                        </div>
+
+
+                        {/* RESULT */}
+
+                        <div className="learn-result">
+
+                          <span>✓</span>
+
+                          <div>
+
+                            <strong>
+                              What this means
+                            </strong>
+
+                            <p>
+                              {gitDashboardState.commandInfo.result}
+                            </p>
+
+                          </div>
+
+                        </div>
+
                       </div>
-                      <div className="step-item" onClick={() => setCommandInput('git commit -m "feat: setup"')}>
-                        <div className="step-code">git commit -m "msg"</div>
-                        <div className="step-desc">Save staged snapshot to history</div>
-                      </div>
-                      <div className="step-item" onClick={() => setCommandInput('git push')}>
-                        <div className="step-code">git push</div>
-                        <div className="step-desc">Push local commits to remote repository</div>
-                      </div>
-                    </div>
+
+                    )}
+
                   </div>
                 )}
 
-                {sideTab === 'about' && (
-                  <div>
-                    <h4 style={{ color: '#fff', marginBottom: '8px' }}>Commit Canvas</h4>
-                    <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                      An interactive visual simulator for mastering Git workflows in real-time. Built to help developers build intuitive understanding of Git states.
-                    </p>
+                {/* EXACT COMMAND TAB IMPLEMENTATION WITH 4 TIERS */}
+                {sideTab === 'command' && (
+                  <div className="tier-container">
+                    
+                    {/* Tier 1: Basics */}
+                    <div className="tier-card">
+                      <div className="tier-header">
+                        <span className="tier-title">Tier 1: Basics</span>
+                        <span className="tier-subtitle">Initialize and stage files</span>
+                      </div>
+                      <div className="command-buttons-list">
+                        <button className="command-btn" onClick={() => handlePresetClick('git init')}>
+                          git init
+                        </button>
+                        <button className="command-btn" onClick={() => handlePresetClick('git add .')}>
+                          git add .
+                        </button>
+                        <button className="command-btn" onClick={() => handlePresetClick('git status')}>
+                          git status
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Tier 2: History */}
+                    <div className="tier-card">
+                      <div className="tier-header">
+                        <span className="tier-title">Tier 2: History</span>
+                        <span className="tier-subtitle">Save and review snapshots</span>
+                      </div>
+                      <div className="command-buttons-list">
+                        <button className="command-btn" onClick={() => handlePresetClick("git commit -m 'init'")}>
+                          git commit -m 'init'
+                        </button>
+                        <button className="command-btn" onClick={() => handlePresetClick('git log')}>
+                          git log
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Tier 3: Branching */}
+                    <div className="tier-card">
+                      <div className="tier-header">
+                        <span className="tier-title">Tier 3: Branching</span>
+                        <span className="tier-subtitle">Parallel development</span>
+                      </div>
+                      <div className="command-buttons-list">
+                        <button className="command-btn" onClick={() => handlePresetClick('git branch')}>
+                          git branch
+                        </button>
+                        <button className="command-btn" onClick={() => handlePresetClick('git checkout -b dev')}>
+                          git checkout -b dev
+                        </button>
+                        <button className="command-btn" onClick={() => handlePresetClick('git merge dev')}>
+                          git merge dev
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Tier 4: Remote */}
+                    <div className="tier-card">
+                      <div className="tier-header">
+                        <span className="tier-title">Tier 4: Remote</span>
+                        <span className="tier-subtitle">Collaborate with others</span>
+                      </div>
+                      <div className="command-buttons-list">
+                        <button className="command-btn" onClick={() => handlePresetClick('git clone url')}>
+                          git clone url
+                        </button>
+                        <button className="command-btn" onClick={() => handlePresetClick('git pull')}>
+                          git pull
+                        </button>
+                        <button className="command-btn" onClick={() => handlePresetClick('git push')}>
+                          git push
+                        </button>
+                      </div>
+                    </div>
+
                   </div>
                 )}
               </div>
@@ -1272,7 +1336,7 @@ export default function CommitCanvas() {
             </div>
             <h1 className="hero-title">Master Version<br />Control Visually.</h1>
             <p className="hero-subtitle">Commit Canvas brings Git workflows to life through interactive, real-time animations. Stop guessing your tree state.</p>
-            
+
             <div className="hero-actions">
               <button className="btn-primary" onClick={() => setActiveTab('playground')}>
                 Start Graphing
@@ -1343,10 +1407,10 @@ export default function CommitCanvas() {
               <h2>How it Works</h2>
               <p>Three simple steps to visual mastery</p>
             </div>
-            
+
             <div className="timeline">
               <div className="timeline-line"></div>
-              
+
               <div className="timeline-item left">
                 <div className="timeline-content">
                   <h4 className="step-title purple">01. Install CLI</h4>
