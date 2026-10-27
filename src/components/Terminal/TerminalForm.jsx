@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { useWorkspace } from '../../context/WorkspaceContext';
 
 export default function TerminalForm({ onCommandRun, onClear, onReset }) {
   const [input, setInput] = useState('');
   const [history, setHistory] = useState([]);
   const [histIdx, setHistIdx] = useState(-1);
   const terminalLogs = useSelector((s) => s.git.terminalLogs || []);
+  const { terminalHeight, setTerminalHeight, zoomLevel, setZoomLevel } = useWorkspace();
   const logEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -57,8 +59,11 @@ export default function TerminalForm({ onCommandRun, onClear, onReset }) {
       {/* =========================================
           1. TERMINAL OUTPUT BOX (matches Playground)
       ========================================= */}
-      <div className="bottom-layout">
-        <div className="terminal-card">
+      <div
+        className="bottom-layout"
+        style={{ height: `${terminalHeight + 42}px`, minHeight: `${terminalHeight + 42}px` }}
+      >
+        <div className="terminal-card" style={{ height: '100%' }}>
           {/* TERMINAL HEADER */}
           <div className="terminal-header">
             <div className="window-buttons">
@@ -70,7 +75,16 @@ export default function TerminalForm({ onCommandRun, onClear, onReset }) {
           </div>
 
           {/* TERMINAL LOGS */}
-          <div className="terminal-logs" id="terminal-log-body">
+          <div
+            className="terminal-logs"
+            id="terminal-log-body"
+            style={{
+              height: `${terminalHeight}px`,
+              maxHeight: `${terminalHeight}px`,
+              flex: '0 0 auto',
+              fontSize: `${0.85 * zoomLevel}rem`,
+            }}
+          >
             {terminalLogs.length === 0 ? (
               <div className="log-line">
                 Welcome! Type commands in the CLI input bar: git init, git add ., git commit -m "msg", git push
@@ -118,6 +132,58 @@ export default function TerminalForm({ onCommandRun, onClear, onReset }) {
         </div>
 
         <div className="terminal-inner">
+          <div
+            aria-label="Workspace display controls"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 4 }}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="glow-btn-outline"
+              style={{ padding: '3px 7px', fontSize: 10 }}
+              aria-label="Decrease terminal output height"
+              title="Decrease output height"
+              onClick={() => setTerminalHeight((height) => Math.max(120, height - 40))}
+            >
+              H−
+            </button>
+            <span style={{ color: 'var(--text-secondary)', fontSize: 10, minWidth: 32, textAlign: 'center' }}>
+              Logs {terminalHeight}px
+            </span>
+            <button
+              type="button"
+              className="glow-btn-outline"
+              style={{ padding: '3px 7px', fontSize: 10 }}
+              aria-label="Increase terminal output height"
+              title="Increase output height"
+              onClick={() => setTerminalHeight((height) => Math.min(400, height + 40))}
+            >
+              H+
+            </button>
+            <button
+              type="button"
+              className="glow-btn-outline"
+              style={{ padding: '3px 7px', fontSize: 10 }}
+              aria-label="Decrease terminal text size"
+              title="Decrease text size"
+              onClick={() => setZoomLevel((zoom) => Math.max(0.8, Math.round((zoom - 0.1) * 10) / 10))}
+            >
+              A−
+            </button>
+            <span style={{ color: 'var(--text-secondary)', fontSize: 10, minWidth: 30, textAlign: 'center' }}>
+              {Math.round(zoomLevel * 100)}%
+            </span>
+            <button
+              type="button"
+              className="glow-btn-outline"
+              style={{ padding: '3px 7px', fontSize: 10 }}
+              aria-label="Increase terminal text size"
+              title="Increase text size"
+              onClick={() => setZoomLevel((zoom) => Math.min(1.4, Math.round((zoom + 0.1) * 10) / 10))}
+            >
+              A+
+            </button>
+          </div>
           <form onSubmit={handleSubmit} className="command-form">
             <div className="terminal-input-row">
               <span className="prompt-symbol">➜</span>
@@ -129,6 +195,7 @@ export default function TerminalForm({ onCommandRun, onClear, onReset }) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
+                style={{ fontSize: `${14 * zoomLevel}px` }}
                 autoComplete="off"
                 autoCorrect="off"
                 spellCheck="false"

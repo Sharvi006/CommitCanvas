@@ -15,6 +15,8 @@ export default function Play({
   const [hasStaged, setHasStaged] = useState(false);
   const [commits, setCommits] = useState([]);
   const [logs, setLogs] = useState(initialLogs);
+  const [branches, setBranches] = useState({ main: null });
+  const [activeBranch, setActiveBranch] = useState("main");
 
   // =========================
   // LEARN / COMMAND EXPLANATION
@@ -611,6 +613,8 @@ export default function Play({
         hasStaged,
         commits,
         logs,
+        branches,
+        activeBranch,
         commandInfo
       });
 
@@ -621,6 +625,8 @@ export default function Play({
     hasStaged,
     commits,
     logs,
+    branches,
+    activeBranch,
     commandInfo,
     onStateChange
   ]);
@@ -643,13 +649,17 @@ export default function Play({
         isInitialized,
         hasStaged,
         commits,
-        logs
+        logs,
+        branches,
+        activeBranch
       },
       {
         setIsInitialized,
         setHasStaged,
         setCommits,
-        setLogs
+        setLogs,
+        setBranches,
+        setActiveBranch
       }
     );
   };
